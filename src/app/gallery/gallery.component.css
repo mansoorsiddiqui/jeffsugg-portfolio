@@ -1,0 +1,27 @@
+:host {
+    display: -webkit-box; 
+    display: -webkit-flex; 
+    display: -ms-flexbox; 
+    display: flex; 
+    -webkit-box-orient: vertical; 
+    -webkit-box-direction: normal; 
+    -webkit-flex-direction: row; 
+        -ms-flex-direction: row; 
+            flex-direction: row; 
+    -webkit-flex-wrap: wrap; 
+        -ms-flex-wrap: wrap; 
+            flex-wrap: wrap;
+    height: 100vw;
+}
+
+:host > div {
+    width: 33.3%;
+}
+
+:host > div > div {
+    margin-bottom: -4px;
+}
+
+img {
+    width: 100%;
+}

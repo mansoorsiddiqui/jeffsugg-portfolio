@@ -1,1 +1,9 @@
-<p>gallery works!</p>
+<div *ngFor="let column of items" [style.width.%]="100/columns">
+    <div *ngFor="let item of column">
+        <img alt={{item.title}} src={{item.src}} />
+    </div>
+</div>
+<!-- 
+<div *ngFor="let item of items">
+    <img alt={{item.title}} src={{item.src}} />
+</div> -->

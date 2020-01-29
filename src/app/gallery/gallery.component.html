@@ -1,6 +1,6 @@
 <div *ngFor="let column of items" [style.width.%]="100/columns">
     <div *ngFor="let item of column">
-        <img alt={{item.title}} src={{item.src}} />
+        <img alt={{item.title}} src={{item.src}} aTilt [tiltSettings]="{speed:1000,scale:1.08,max:10,perspective:700}" />
     </div>
 </div>
 <!-- 

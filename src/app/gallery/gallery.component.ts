@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, Renderer2 } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 
@@ -24,10 +24,20 @@ export class GalleryComponent implements OnInit {
   items = [];
   width: number;
   columns = 1;
+  loaded = 0;
 
   constructor(
     private el: ElementRef,
+    private renderer: Renderer2,
   ) { }
+
+  imageLoaded(e) {
+    this.loaded++;
+    if (this.loaded === this.images.length) {
+      this.renderer.setStyle(this.el.nativeElement, 'visibility', 'visible');
+      this.renderer.setStyle(this.el.nativeElement, 'opacity', '1');
+    }
+  }
 
   async ngOnInit() {
     const getImages = firebase.firestore().collection("images").get().then((querySnapshot) => {
@@ -40,7 +50,7 @@ export class GalleryComponent implements OnInit {
     this.images.sort(() => Math.random() - 0.5);
 
     this.width = this.el.nativeElement.offsetWidth;
-    this.columns = (this.width > 1024) ? 3 : (this.width > 640) ? 2 : 1 ;
+    this.columns = (this.width > 1440) ? 4 : (this.width > 1024) ? 3 : (this.width > 640) ? 2 : 1 ;
 
     for (let i = 0; i < this.columns; i++) {
       this.items.push([]);
@@ -51,6 +61,7 @@ export class GalleryComponent implements OnInit {
         title: this.images[i].name,
         src: this.images[i].thumb,
         height: this.images[i].thumbHeight,
+        show: false,
       })
     }
 

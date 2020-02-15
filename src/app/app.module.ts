@@ -6,11 +6,13 @@ import { DeferLoadModule } from '@trademe/ng-defer-load';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GalleryComponent } from './gallery/gallery.component';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GalleryComponent
+    GalleryComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

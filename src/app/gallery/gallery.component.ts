@@ -1,34 +1,29 @@
-import { Component, OnInit, ElementRef, Renderer2 } from '@angular/core';
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBY7sc5L1Snk3dFBBFA4BxrExg92mwl4KE",
-  authDomain: "jeffsugg-portfolio.firebaseapp.com",
-  databaseURL: "https://jeffsugg-portfolio.firebaseio.com",
-  projectId: "jeffsugg-portfolio",
-  storageBucket: "jeffsugg-portfolio.appspot.com",
-  messagingSenderId: "932264466430",
-  appId: "1:932264466430:web:ad5f5e70689b73ebb6d2af",
-  measurementId: "G-E1GKQTTZYP"
-};
-firebase.initializeApp(firebaseConfig);
+import { Component, OnInit, ElementRef, Renderer2, OnDestroy } from '@angular/core';
+import { ContentfulService } from 'src/app/contentful.service';
+import { Entry } from 'contentful';
+import { SCREEN_SIZE, Project } from '../constants';
+import { Observable, Subscription, fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-gallery',
   templateUrl: './gallery.component.html',
   styleUrls: ['./gallery.component.css']
 })
-export class GalleryComponent implements OnInit {
+export class GalleryComponent implements OnInit, OnDestroy {
+  resizeObservable$: Observable<Event>;
+  resizeSubscription$: Subscription;
+
+  projects: Entry<any>[];
   images = [];
-  items = [];
-  width: number;
-  columns = 1;
+  columns = [];
+  numColumns = 1;
   loaded = 0;
 
   constructor(
-    private el: ElementRef,
+    public el: ElementRef,
     private renderer: Renderer2,
+    private contentfulService: ContentfulService
   ) { }
 
   imageLoaded(e) {
@@ -40,39 +35,55 @@ export class GalleryComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const getImages = firebase.firestore().collection("images").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            this.images.push(doc.data());
-        });
-    });
-
-    await getImages;
-    this.images.sort(() => Math.random() - 0.5);
-
-    this.width = this.el.nativeElement.offsetWidth;
-    this.columns = (this.width > 1440) ? 4 : (this.width > 1024) ? 3 : (this.width > 640) ? 2 : 1 ;
-
-    for (let i = 0; i < this.columns; i++) {
-      this.items.push([]);
-    }
-
-    for (let i = 0; i < this.images.length; i++) {
-      this.items[this.getShortestColumn()].push({
-        title: this.images[i].name,
-        src: this.images[i].thumb,
-        height: this.images[i].thumbHeight,
-        show: false,
-      })
-    }
-
-    console.log(this.items);
-
+    this.setColumns();
+    this.watchForResize();
+    await this.loadProjects();
+    this.projects.forEach(project => console.log(this.getThumbnailUrl(project, 640)));
+    this.sortProjects();
   }
 
-  getShortestColumn () {
-    const columnLengths = { ...this.items.map(col => col.reduce((a, b) => a+b.height, 0)) };
-    const shortest = Object.keys(columnLengths).sort((a,b)=> columnLengths[a]-columnLengths[b]).shift();
-    return shortest;
+  ngOnDestroy() {
+    this.resizeSubscription$.unsubscribe();
+  }
+
+  setColumns() {
+    this.columns = [];
+    const width = this.el.nativeElement.offsetWidth;
+    this.numColumns = (width > SCREEN_SIZE.LARGE) ? 4
+                        : (width > SCREEN_SIZE.MEDIUM) ? 3
+                        : (width > SCREEN_SIZE.SMALL) ? 2
+                        : 1 ;
+    for (let i = 0; i < this.numColumns; i++) {
+      this.columns.push([]);
+    }
+  }
+
+  watchForResize() {
+    this.resizeObservable$ = fromEvent(window, 'resize');
+    this.resizeSubscription$ = this.resizeObservable$.pipe(debounceTime(500)).subscribe(() => { this.setColumns(); this.sortProjects(); });
+  }
+
+  async loadProjects() {
+    return this.contentfulService.getProjects().then(projects => this.projects = projects);
+  }
+
+  sortProjects() {
+    let currentColumn = 0;
+    this.projects.forEach(project => {
+      const item: Project = {
+        title: project.fields.title,
+        description: project.fields.description,
+        thumbnail: this.getThumbnailUrl(project, 640)
+      };
+      this.columns[currentColumn % this.numColumns].push(item);
+      currentColumn++;
+      console.log(this.columns);
+      
+    });
+  }
+
+  getThumbnailUrl(project: Entry<any>, width: number) {
+    return `https:${project.fields.images[0].fields.file.url}?fm=jpg&fl=progressive&w=${width}&q=90`;
   }
 
 }

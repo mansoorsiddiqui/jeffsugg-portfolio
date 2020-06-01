@@ -7,12 +7,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GalleryComponent } from './gallery/gallery.component';
 import { HeaderComponent } from './header/header.component';
+import { GalleryItemComponent } from './gallery-item/gallery-item.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     GalleryComponent,
-    HeaderComponent
+    HeaderComponent,
+    GalleryItemComponent
   ],
   imports: [
     BrowserModule,

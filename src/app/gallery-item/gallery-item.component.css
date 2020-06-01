@@ -1,0 +1,50 @@
+
+:host {
+    position: relative;
+    color:white;
+    transition: all .3s ease;
+    transition-property: box-shadow, filter;
+    z-index: initial;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+:host:hover {
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 20px 10px rgba(15, 15, 15, 0.7);
+    -webkit-filter: contrast(90%) saturate(140%);
+            filter: contrast(90%) saturate(140%);
+}
+
+:host img {
+    width: 100%;
+    z-index: initial;
+}
+
+:host:hover img {
+    z-index: 1000;
+}
+
+:host > div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 100px;
+    transform: translate3d(-50%, -50%, 20px);
+    overflow: hidden;
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity .3s ease-in;
+}
+
+:host:hover > div {
+    opacity: 1;
+}
+
+:host > div > * {
+    text-shadow: 0 0 10px rgba(51, 51, 51, 0.9);
+}

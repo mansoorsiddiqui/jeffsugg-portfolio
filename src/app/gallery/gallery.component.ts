@@ -19,6 +19,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
   columns = [];
   numColumns = 1;
   loaded = 0;
+  screenWidth: number;
 
   constructor(
     public el: ElementRef,
@@ -26,18 +27,12 @@ export class GalleryComponent implements OnInit, OnDestroy {
     private contentfulService: ContentfulService
   ) { }
 
-  imageLoaded(e) {
-    this.loaded++;
-    if (this.loaded === this.images.length) {
-      this.renderer.setStyle(this.el.nativeElement, 'visibility', 'visible');
-      this.renderer.setStyle(this.el.nativeElement, 'opacity', '1');
-    }
-  }
-
   async ngOnInit() {
+    this.screenWidth = window.innerWidth;
     this.setColumns();
     this.watchForResize();
     await this.loadProjects();
+    console.log(this.projects);
     this.projects.forEach(project => console.log(this.getThumbnailUrl(project, 640)));
     this.sortProjects();
   }
@@ -60,7 +55,15 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
   watchForResize() {
     this.resizeObservable$ = fromEvent(window, 'resize');
-    this.resizeSubscription$ = this.resizeObservable$.pipe(debounceTime(500)).subscribe(() => { this.setColumns(); this.sortProjects(); });
+    this.resizeSubscription$ = this.resizeObservable$.pipe(debounceTime(500)).subscribe((e) => this.recalculateColumns(e));
+  }
+
+  recalculateColumns(e) {
+    if (this.screenWidth !== e.target.innerWidth) {
+      this.setColumns();
+      this.sortProjects();
+      this.screenWidth = e.target.innerWidth;
+    }
   }
 
   async loadProjects() {
@@ -73,12 +76,12 @@ export class GalleryComponent implements OnInit, OnDestroy {
       const item: Project = {
         title: project.fields.title,
         description: project.fields.description,
-        thumbnail: this.getThumbnailUrl(project, 640)
+        thumbnail: this.getThumbnailUrl(project, 640),
+        show: false,
       };
       this.columns[currentColumn % this.numColumns].push(item);
       currentColumn++;
       console.log(this.columns);
-      
     });
   }
 

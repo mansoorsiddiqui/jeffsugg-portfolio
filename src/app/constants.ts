@@ -5,6 +5,7 @@ export const SCREEN_SIZE = {
 }
 
 export interface Project {
+    id: number;
     title: string;
     description: string;
     thumbnail: string;

@@ -8,13 +8,15 @@ import { AppComponent } from './app.component';
 import { GalleryComponent } from './gallery/gallery.component';
 import { HeaderComponent } from './header/header.component';
 import { GalleryItemComponent } from './gallery-item/gallery-item.component';
+import { ItemViewComponent } from './item-view/item-view.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     GalleryComponent,
     HeaderComponent,
-    GalleryItemComponent
+    GalleryItemComponent,
+    ItemViewComponent
   ],
   imports: [
     BrowserModule,

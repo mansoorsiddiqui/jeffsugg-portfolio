@@ -4,6 +4,7 @@ import { Entry } from 'contentful';
 import { SCREEN_SIZE, Project } from '../constants';
 import { Observable, Subscription, fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gallery',
@@ -23,6 +24,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
   constructor(
     public el: ElementRef,
+    private router: Router,
     private renderer: Renderer2,
     private contentfulService: ContentfulService
   ) { }
@@ -33,7 +35,6 @@ export class GalleryComponent implements OnInit, OnDestroy {
     this.watchForResize();
     await this.loadProjects();
     console.log(this.projects);
-    this.projects.forEach(project => console.log(this.getThumbnailUrl(project, 640)));
     this.sortProjects();
   }
 
@@ -72,8 +73,9 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
   sortProjects() {
     let currentColumn = 0;
-    this.projects.forEach(project => {
+    this.projects.forEach((project, index, projects) => {
       const item: Project = {
+        id: index,
         title: project.fields.title,
         description: project.fields.description,
         thumbnail: this.getThumbnailUrl(project, 640),
@@ -87,6 +89,11 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
   getThumbnailUrl(project: Entry<any>, width: number) {
     return `https:${project.fields.images[0].fields.file.url}?fm=jpg&fl=progressive&w=${width}&q=90`;
+  }
+
+  navigateToItem(itemID: number) {
+    localStorage.setItem('currentItem', JSON.stringify(this.projects[itemID].fields));
+    this.router.navigateByUrl('/view');
   }
 
 }

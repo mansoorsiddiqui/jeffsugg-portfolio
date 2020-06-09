@@ -1,6 +1,6 @@
 <div *ngFor="let column of columns" [style.width.%]="100/numColumns">
     <div *ngFor="let item of column" (deferLoad)="item.show=true" aTilt [tiltSettings]="{speed:1000,scale:1.08,max:10,perspective:700}">
-        <app-gallery-item *ngIf="item.show" [item]="item" [width]="100/numColumns">
+        <app-gallery-item *ngIf="item.show" [item]="item" [width]="100/numColumns" (click)="navigateToItem(item.id)">
         </app-gallery-item>
     </div>
 </div>
